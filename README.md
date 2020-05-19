@@ -41,7 +41,7 @@
 
 查询大量资料发现，let和const确实也存在变量提升 ecma文档中的定义
 
-![let-const](./images/let%20const.png)
+![let-const](.\/images\/letconst.png)
 
 
 
