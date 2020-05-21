@@ -114,6 +114,4 @@ TypeScript是由Microsoft开发的面向对象语言，TypeScript是JavaScript�
 
 
 ## 项目文件说明
-
-- notes : 笔记
 - code : 代码
