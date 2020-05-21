@@ -103,6 +103,14 @@ TypeScript是由Microsoft开发的面向对象语言，TypeScript是JavaScript�
 ### 第十一题
 
 优点：
+* TypeScript 有强类型系统，从而减少代码中的类型异常，提高编码效率，提高系统的稳定性。
+* TypeScript 对ECMAscript的新特性有更好的支持，兼容性好。
+* TypeScript 的代码生态更健全，IDE支持更友好。
+* TypeScript 适合大型项目。
+
+缺点：
+* TypeScript 有很多新的概念引入，学习成本比 JavaScript 较高。
+* TypeScript 对于小型项目而言，提高了开发成本  
 
 
 ## 项目文件说明
