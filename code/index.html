@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="container">
+        {{ msg }}<br>
+        <input class="inp-text" type="text" v-model="inpText">
+        <p>{{ inpText }}</p>
+        <div class="text-box">
+            <p class="show-text">{{ msg }}</p>
+        </div>
+    </div>
+    <script>
+
+function Publisher() {
+            this.subs = []; // 订阅者容器
+        }
+        Publisher.prototype = {
+            constructor: Publisher,
+            add: function (sub) {
+                this.subs.push(sub); // 添加订阅者
+            },
+            notify: function () {
+                this.subs.forEach(function (sub) {
+                    sub.update(); // 发布订阅
+                });
+            }
+        };
+
+
+        function Subscriber(node, vm, name) {
+            Publisher.global = this;
+            this.node = node;
+            this.vm = vm;
+            this.name = name;
+            this.update();
+            Publisher.global = null;
+        }
+        Subscriber.prototype = {
+            constructor: Subscriber,
+            update: function () {
+                let vm = this.vm;
+                let node = this.node;
+                let name = this.name;
+                switch (this.node.nodeType) {
+                    case 1:
+                        node.value = vm[name];
+                        break;
+                    case 3:
+                        node.nodeValue = vm[name];
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        function Vue(options) {
+            this.data = options.data;
+            let id = options.el;
+
+            observe(this.data, this); // 将每个data属相绑定到Vue的实例上this
+            let container = document.getElementById(id);
+            let fragment = virtualDom(container, this); // 这里通过vm对象初始化
+            container.appendChild(fragment);
+        }
+        let vm = new Vue({
+            el: "container", 
+            data: {
+                msg: 'Hello world!',
+                inpText: 'Input text'
+            }
+        })
+
+        function observe(obj, vm) {
+            Object.keys(obj).forEach((key) => {
+                defineReact(vm, key, obj[key]);
+            })
+        }
+        function defineReact(obj, key, value) {
+            let publisher = new Publisher();
+            Object.defineProperty(obj, key, {
+                set: function (newValue) {
+                    console.log(`触发setter`);
+                    value = newValue;
+                    console.log(value);
+                    publisher.notify(); // 发布订阅
+                },
+                get: function () {
+                    console.log(`触发getter`);
+
+                    if (Publisher.global) { //这里为什么来添加判断条件，主要是让publisher.add只执行一次，初始化虚拟dom编译的时候来执行
+                        publisher.add(Publisher.global); // 添加订阅者
+                    }
+                    return value;
+                }
+            });
+        }
+
+        //虚拟dom创建方法
+        function virtualDom(node, data) {
+            let frag = document.createDocumentFragment();
+            let child;
+            // 遍历dom节点
+            while (child = node.firstChild) {
+                compile(child, data);
+                frag.appendChild(child);
+            }
+
+            return frag;
+        }
+
+        //编译规则
+        function compile(node, data) {
+            let reg = /\{\{(.*)\}\}/g;
+            if (node.nodeType === 1) { // 标签
+                let attr = node.attributes;
+                for (let i = 0, len = attr.length; i < len; i++) {
+                    // console.log(attr[i].nodeName, attr[i].nodeValue);
+                    if (attr[i].nodeName === 'v-model') {
+                        let name = attr[i].nodeValue;
+
+                        new Subscriber(node, data, name);
+
+                        // ------------------------添加监听事件
+                        node.addEventListener('keyup', function (e) {
+                            data[name] = e.target.value;
+                        }, false);
+                        // -----------------------------------
+                    }
+                }
+                if (node.hasChildNodes()) {
+                    node.childNodes.forEach((item) => {
+                        compile(item, data); // 递归
+                    });
+                }
+            }
+            if (node.nodeType === 3) { // 文本节点
+                if (reg.test(node.nodeValue)) {
+                    let name = RegExp.$1;
+                    name = name.trim();
+                    // ---------------------这里被替换掉
+                    // node.nodeValue = data[name];
+                    new Subscriber(node, data, name);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

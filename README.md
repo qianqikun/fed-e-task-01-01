@@ -86,6 +86,24 @@ Event Loop 负责监听调用栈和消息队列，当调用栈中的任务都结
 
 ### 第九题
 
+```js
+async function bar() {
+    let a = await new Promise(resolve => { setTimeout(() => resolve('hello'), 10) });
+    let b = await new Promise(resolve => { setTimeout(() => resolve('lagou'), 10) });
+    let c = await new Promise(resolve => { setTimeout(() => resolve('I love U'), 10) });
+    console.log(`${a} ${b} ${c}`)
+}
+bar()
+```
+
+### 第十题
+
+TypeScript是由Microsoft开发的面向对象语言，TypeScript是JavaScript的超集，包含了 JavaScript 的所有元素，在TypeScript中可以运行JavaScript代码。TypeScript实现以面向对象编程的方式使用Javascript。
+
+### 第十一题
+
+优点：
+
 
 ## 项目文件说明
 
